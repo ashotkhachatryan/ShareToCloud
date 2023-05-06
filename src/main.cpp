@@ -3,10 +3,48 @@
 #include "GoogleManager/constants.h"
 #include "GoogleManager/google_drive.h"
 
+#include <queue>
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cout << "Please provide client secrets json file path\n";
         return -1;
+    }
+
+    std::queue<std::string> commands;
+    for (int i = 0; i < argc; i++)
+    {
+        commands.push(argv[i]);
+    }
+
+    std::string FolderPath;
+    std::string GdrivePath = "/root";
+    while (!commands.empty())
+    {
+        std::string command = commands.front();
+        commands.pop();
+
+        if (command == "-h" || command == "--help")
+        {
+
+        }
+        else if (command == "-s" || command == "--client-secrets")
+        {
+
+        }
+        else if (command == "-f" || command == "--folder")
+        {
+            FolderPath = commands.front();
+            commands.pop();
+        }
+        else if (command == "-p" || command == "--google-drive-path")
+        {
+            GdrivePath = commands.front();
+            commands.pop();
+        }
+        else
+        {
+        }
     }
 
     GoogleAuthenticator auth{
@@ -14,8 +52,6 @@ int main(int argc, char** argv) {
         {Scopes::DriveMetadataReadonly, Scopes::DrivePhotosReadonly}
     };
 
-    std::string FolderPath = ""; // THIS IS GOING TO BE THE FOLDER PATH TO TRACK
-    std::string GdrivePath = "/root"; // THIS IS GOING TO BE THE GOOGLE DRIVE PATH
     auto credentials = auth.Authenticate();
     if (credentials.has_value()) {
         GDrive drive(credentials.value());
