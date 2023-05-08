@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
 
     GoogleAuthenticator auth{
         ClientSecret::FromJson(client_secrets_path),
-        {Scopes::DriveMetadataReadonly, Scopes::DrivePhotosReadonly}
+        {Scopes::DriveMetadataReadonly, Scopes::DrivePhotosReadonly, Scopes::Drive}
     };
 
     auto credentials = auth.Authenticate();
