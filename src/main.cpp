@@ -1,7 +1,7 @@
 #include "FolderTracker.h"
-#include "GoogleManager/google_authenticator.h"
-#include "GoogleManager/constants.h"
-#include "GoogleManager/google_drive.h"
+#include "google_authenticator.h"
+#include "constants.h"
+#include "google_drive.h"
 
 #include <queue>
 
