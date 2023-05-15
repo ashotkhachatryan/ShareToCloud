@@ -8,7 +8,9 @@ if(OPENSSL_FOUND)
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
-set(SRC_FILES src/main.cpp)
+set(SRC_FILES src/main.cpp
+              src/folder_tracker.cpp
+              src/folder_tracker.h)
 
 include(ExternalProject)
 ExternalProject_Add(
