@@ -2,15 +2,18 @@
 #include "google_authenticator.h"
 #include "constants.h"
 #include "google_drive.h"
+#include "filesystem"
 
 #include <queue>
+
+namespace fs = std::filesystem;
 
 void PrintHelp()
 {
     std::stringstream ss;
     ss << "Usage: ShareToCloud [OPTION]...\n";
     ss << "  -s, --client-secrets       Client Secrets json file path\n";
-    ss << "  -f, --folder               Local folder that needs to be tracked\n";
+    ss << "  -d, --directory            Local directory that needs to be tracked\n";
     ss << "  -p, --google-drive-path    Google Drive folder path where files will be uploaded\n";
     ss << "  -h, --help                 Display this help and exit\n";
     std::cout << ss.str();
@@ -23,7 +26,7 @@ int main(int argc, char** argv) {
         commands.push(argv[i]);
     }
 
-    std::string folder_path;
+    std::string directory_path;
     std::string gdrive_path = "/root";
     std::string client_secrets_path;
 
@@ -42,9 +45,9 @@ int main(int argc, char** argv) {
             client_secrets_path = commands.front();
             commands.pop();
         }
-        else if (command == "-f" || command == "--folder")
+        else if (command == "-d" || command == "--directory")
         {
-            folder_path = commands.front();
+            directory_path = commands.front();
             commands.pop();
         }
         else if (command == "-p" || command == "--google-drive-path")
@@ -59,9 +62,20 @@ int main(int argc, char** argv) {
         }
     }
 
-    std::cout << folder_path << std::endl;
+    if (client_secrets_path.empty())
+    {
+        fs::path exePath(argv[0]);
+        for (const auto& file : fs::directory_iterator(exePath.parent_path()))
+        {
+            if (file.path().filename().string().starts_with("client_secret"))
+            {
+                client_secrets_path = file.path().string();
+            }
+        }
+    }
+
     std::cout << client_secrets_path << std::endl;
-    if (folder_path.empty() || client_secrets_path.empty())
+    if (directory_path.empty() || client_secrets_path.empty())
     {
         PrintHelp();
         return -1;
@@ -76,7 +90,7 @@ int main(int argc, char** argv) {
     if (credentials.has_value()) {
         GDrive drive(credentials.value());
 
-        FolderTracker tracker(folder_path, [&drive, &gdrive_path](std::filesystem::path file) {
+        FolderTracker tracker(directory_path, [&drive, &gdrive_path](std::filesystem::path file) {
             drive.UploadFile(file.string(), gdrive_path);
         });
     }
